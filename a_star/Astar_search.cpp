@@ -58,7 +58,7 @@ bool Compare(vector<int> node1, vector<int> node2)
     int f2 = node2[2] + node2[3];
 
     if(f1 > f2)
-        isgreater = true;
+      isgreater = true;
 
     return isgreater;
 }
@@ -68,6 +68,27 @@ void AddToOpen(int x,int y,int g,int h, vector<vector<int>> &openNodesList, vect
     vector<int> openNode{x,y,g,h};
     openNodesList.push_back(openNode);
     grid[x][y] = State::kClosed;
+}
+
+//checks if cell doesnot present obstacles or is not visited one
+bool CheckValidCell(int x,int y,vector<vector<State>> &grid){
+
+    bool isValidcell;
+        if(x < grid.size() && y < grid[0].size()){
+        if(grid.at(x)[y] == State::kObstacle || grid.at(x)[y] == State::kClosed)
+          isValidcell = false;
+        else
+          isValidcell = true;
+    }
+    else
+      isValidcell = false;
+
+    return isValidcell;
+}
+
+//sort 2d vectors according in descending order
+void CellSort(vector<vector<int>> *v) {
+  sort(v->begin(), v->end(), Compare);
 }
 
 /**
@@ -80,25 +101,28 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
 
   //Initialize the starting node.
   int g = 0;
-  int h = Heuristic(init[0],init[1],goal[0],goal[1]);
+  int x = init[0];
+  int y = init[1];
+  int h = Heuristic(x,y,goal[0],goal[1]);
 
   //add the starting node to the open vector.
-  AddToOpen(init[0],init[1],g,h,open,grid);
+  AddToOpen(x,y,g,h,open,grid);
 
   while(open.size() != 0){
     //Sort the open list using CellSort, and get the current node.
     CellSort(&open);
 
-    //Get the x and y values from the current node,
-    // and set grid[x][y] to kPath.
-    x = open[0][0];
-    y = open[0][1];
+    //last one has min f value
+    auto current = open.back();
+    x = current[0];
+    y = current[1];
+    open.pop_back();
 
     //adding to a path towards goal
     grid[x][y] = State::kPath;
 
     //Check if you've reached the goal. If so, return grid.
-    if(x == goal[0] && y == goal[1] ==y)
+    if(x == goal[0] && y == goal[1])
       return grid;
 
     // If we're not done, expand search to current node's neighbors. This step will be completed in a later quiz.
