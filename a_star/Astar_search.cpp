@@ -12,6 +12,8 @@ using std::abs;
 
 enum class State {kEmpty, kObstacle, kClosed};
 
+// directional deltas
+const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
 vector<State> ParseLine(string line) {
     istringstream sline(line);
@@ -42,6 +44,26 @@ vector<vector<State>> ReadBoardFile(string path) {
   return board;
 }
 
+//expands neighbours looking for navigable spots and adds it openlist
+void ExpandNeighbors(const vector<int>& currNode, const int goal[2], vector<vector<int>> &open, const vector<vector<State>> &grid) {
+  // TODO: Get current node's data.
+        int x = currNode[0];
+        int y = currNode[1];
+        int g = currNode[2];
+        int x2,y2,g2,h2;
+
+        //Loop through current node's potential neighbors.
+        for(int i=0;i<4;i++){
+            x2 = x + delta[i][0];
+            y2 = y + delta[i][1];
+
+            if(CheckValidCell(x2,y2,grid)){
+                g2 = g + 1;
+                h2 = Heuristic(x2,y2,goal[0],goal[1]);
+                AddToOpen(x2,y2,g2,h2,open,grid);
+            }
+        }
+}
 
 // Calculate the manhattan distance
 int Heuristic(int x1, int y1, int x2, int y2) {
