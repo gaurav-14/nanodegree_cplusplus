@@ -48,6 +48,21 @@ int Heuristic(int x1, int y1, int x2, int y2) {
   return abs(x2 - x1) + abs(y2 - y1);
 }
 
+//compare two f-values of a node
+bool Compare(vector<int> node1, vector<int> node2)
+{
+    bool isgreater = false;
+
+    //cost function of two nodes
+    int f1= node1[2] + node1[3];
+    int f2 = node2[2] + node2[3];
+
+    if(f1 > f2)
+        isgreater = true;
+
+    return isgreater;
+}
+
 void AddToOpen(int x,int y,int g,int h, vector<vector<int>> &openNodesList, vector<vector<State>> &grid)
 {
     vector<int> openNode{x,y,g,h};
