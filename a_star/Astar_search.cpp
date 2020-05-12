@@ -48,8 +48,12 @@ int Heuristic(int x1, int y1, int x2, int y2) {
   return abs(x2 - x1) + abs(y2 - y1);
 }
 
-// TODO: Write the AddToOpen function here.
-
+void AddToOpen(int x,int y,int g,int h, vector<vector<int>> &openNodesList, vector<vector<State>> &grid)
+{
+    vector<int> openNode{x,y,g,h};
+    openNodesList.push_back(openNode);
+    grid[x][y] = State::kClosed;
+}
 
 /**
  * Implementation of A* search algorithm
