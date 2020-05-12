@@ -10,7 +10,7 @@ using std::string;
 using std::vector;
 using std::abs;
 
-enum class State {kEmpty, kObstacle, kClosed};
+enum class State {kEmpty, kObstacle, kClosed, kStart, kFinish};
 
 // directional deltas
 const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
@@ -144,12 +144,11 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
     grid[x][y] = State::kPath;
 
     //Check if you've reached the goal. If so, return grid.
-    if(x == goal[0] && y == goal[1])
+    if(x == goal[0] && y == goal[1]){
+        grid[init[0]][init[1]] = State::kStart;
+        grid[goal[0]][goal[1]] = State::kFinish;
+    }
       return grid;
-
-    // If we're not done, expand search to current node's neighbors. This step will be completed in a later quiz.
-    // ExpandNeighbors
-
   }
 
   cout << "No path found!" << "\n";
@@ -158,9 +157,13 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
 
 
 string CellString(State cell) {
-  switch(cell) {
-    case State::kObstacle: return "⛰️   ";
-    default: return "0   ";
+    switch(cell) {
+      case State::kObstacle: return "⛰️   ";
+      case State::kPath: return "🚗   ";
+      case State::kStart: return "🚦   ";
+      case State::kFinish: return "🏁  ";
+
+      default: return "0   ";
   }
 }
 
