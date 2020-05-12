@@ -85,8 +85,29 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
   //add the starting node to the open vector.
   AddToOpen(init[0],init[1],g,h,open,grid);
 
+  while(open.size() != 0){
+    //Sort the open list using CellSort, and get the current node.
+    CellSort(&open);
+
+    //Get the x and y values from the current node,
+    // and set grid[x][y] to kPath.
+    x = open[0][0];
+    y = open[0][1];
+
+    //adding to a path towards goal
+    grid[x][y] = State::kPath;
+
+    //Check if you've reached the goal. If so, return grid.
+    if(x == goal[0] && y == goal[1] ==y)
+      return grid;
+
+    // If we're not done, expand search to current node's neighbors. This step will be completed in a later quiz.
+    // ExpandNeighbors
+
+  }
+
   cout << "No path found!" << "\n";
-  return std::vector<vector<State>> {};
+  return open;
 }
 
 
