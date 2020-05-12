@@ -58,8 +58,17 @@ void AddToOpen(int x,int y,int g,int h, vector<vector<int>> &openNodesList, vect
 /**
  * Implementation of A* search algorithm
  */
-vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2]) {
+vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2])
+{
+  //openNode list
+  vector<vector<int>> open{};
 
+  //Initialize the starting node.
+  int g = 0;
+  int h = Heuristic(init[0],init[1],goal[0],goal[1]);
+
+  //add the starting node to the open vector.
+  AddToOpen(init[0],init[1],g,h,open,grid);
 
   cout << "No path found!" << "\n";
   return std::vector<vector<State>> {};
