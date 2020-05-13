@@ -140,7 +140,6 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
     y = current[1];
     open.pop_back();
 
-    cout << x << y << "\n";
     //adding to a path towards goal
     grid[x][y] = State::kPath;
 
@@ -171,7 +170,6 @@ string CellString(State cell) {
   }
 }
 
-
 void PrintBoard(const vector<vector<State>> board) {
   for (int i = 0; i < board.size(); i++) {
     for (int j = 0; j < board[i].size(); j++) {
@@ -181,15 +179,11 @@ void PrintBoard(const vector<vector<State>> board) {
   }
 }
 
-#include "test.cpp"
-
 int main() {
   int init[2]{0, 0};
   int goal[2]{4, 5};
   auto board = ReadBoardFile("../1.board");
-
   auto solution = Search(board, init, goal);
 
   PrintBoard(solution);
-  TestSearch();
 }
