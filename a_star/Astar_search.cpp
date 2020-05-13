@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -10,7 +11,7 @@ using std::string;
 using std::vector;
 using std::abs;
 
-enum class State {kEmpty, kObstacle, kClosed, kStart, kFinish};
+enum class State {kEmpty, kObstacle, kClosed, kPath, kStart, kFinish};
 
 // directional deltas
 const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
@@ -44,9 +45,55 @@ vector<vector<State>> ReadBoardFile(string path) {
   return board;
 }
 
+//checks if cell doesnot present obstacles or is not visited one
+bool CheckValidCell(int x,int y,vector<vector<State>> &grid){
+   bool isValidcell;
+   if(x >= 0 && x < grid.size() && y >= 0 && y < grid[0].size()){
+        if(grid[x][y] == State::kEmpty)
+            isValidcell = true;
+        else
+            isValidcell = false;
+    }
+    else
+      isValidcell = false;
+
+    return isValidcell;
+}
+
+// Calculate the manhattan distance
+int Heuristic(int x1, int y1, int x2, int y2) {
+  return abs(x2 - x1) + abs(y2 - y1);
+}
+
+//compare two f-values of a node
+bool Compare(vector<int> node1, vector<int> node2)
+{
+    //cost function of two nodes
+    int f1= node1[2] + node1[3];
+    int f2 = node2[2] + node2[3];
+
+    if(f1 > f2)
+        return true;
+    else
+        return false;
+}
+
+void AddToOpen(int x,int y,int g,int h, vector<vector<int>> &openNodesList, vector<vector<State>> &grid)
+{
+    vector<int> openNode{x,y,g,h};
+    openNodesList.push_back(openNode);
+    grid[x][y] = State::kClosed;
+}
+
+//sort 2d vectors according in descending order
+void CellSort(vector<vector<int>> *v) {
+  sort(v->begin(), v->end(), Compare);
+}
+
+
 //expands neighbours looking for navigable spots and adds it openlist
-void ExpandNeighbors(const vector<int>& currNode, const int goal[2], vector<vector<int>> &open, const vector<vector<State>> &grid) {
-  // TODO: Get current node's data.
+void ExpandNeighbors(const vector<int>& currNode,int goal[2], vector<vector<int>> &open, vector<vector<State>> &grid) {
+        //Get current node's data.
         int x = currNode[0];
         int y = currNode[1];
         int g = currNode[2];
@@ -65,53 +112,6 @@ void ExpandNeighbors(const vector<int>& currNode, const int goal[2], vector<vect
         }
 }
 
-// Calculate the manhattan distance
-int Heuristic(int x1, int y1, int x2, int y2) {
-  return abs(x2 - x1) + abs(y2 - y1);
-}
-
-//compare two f-values of a node
-bool Compare(vector<int> node1, vector<int> node2)
-{
-    bool isgreater = false;
-
-    //cost function of two nodes
-    int f1= node1[2] + node1[3];
-    int f2 = node2[2] + node2[3];
-
-    if(f1 > f2)
-      isgreater = true;
-
-    return isgreater;
-}
-
-void AddToOpen(int x,int y,int g,int h, vector<vector<int>> &openNodesList, vector<vector<State>> &grid)
-{
-    vector<int> openNode{x,y,g,h};
-    openNodesList.push_back(openNode);
-    grid[x][y] = State::kClosed;
-}
-
-//checks if cell doesnot present obstacles or is not visited one
-bool CheckValidCell(int x,int y,vector<vector<State>> &grid){
-
-    bool isValidcell;
-        if(x < grid.size() && y < grid[0].size()){
-        if(grid.at(x)[y] == State::kObstacle || grid.at(x)[y] == State::kClosed)
-          isValidcell = false;
-        else
-          isValidcell = true;
-    }
-    else
-      isValidcell = false;
-
-    return isValidcell;
-}
-
-//sort 2d vectors according in descending order
-void CellSort(vector<vector<int>> *v) {
-  sort(v->begin(), v->end(), Compare);
-}
 
 /**
  * Implementation of A* search algorithm
@@ -130,7 +130,7 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
   //add the starting node to the open vector.
   AddToOpen(x,y,g,h,open,grid);
 
-  while(open.size() != 0){
+  while(open.size() > 0){
     //Sort the open list using CellSort, and get the current node.
     CellSort(&open);
 
@@ -140,6 +140,7 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
     y = current[1];
     open.pop_back();
 
+    cout << x << y << "\n";
     //adding to a path towards goal
     grid[x][y] = State::kPath;
 
@@ -147,12 +148,15 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
     if(x == goal[0] && y == goal[1]){
         grid[init[0]][init[1]] = State::kStart;
         grid[goal[0]][goal[1]] = State::kFinish;
+        return grid;
     }
-      return grid;
+
+    ExpandNeighbors(current,goal,open,grid);
+
   }
 
   cout << "No path found!" << "\n";
-  return open;
+  return vector<vector<State>>{};
 }
 
 
@@ -177,10 +181,15 @@ void PrintBoard(const vector<vector<State>> board) {
   }
 }
 
+#include "test.cpp"
+
 int main() {
   int init[2]{0, 0};
   int goal[2]{4, 5};
-  auto board = ReadBoardFile("1.board");
+  auto board = ReadBoardFile("../1.board");
+
   auto solution = Search(board, init, goal);
+
   PrintBoard(solution);
+  TestSearch();
 }
